@@ -18,12 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# Authors: Christian Menard
+# Authors: Christian Menard,
+#          Matthias Jung
 
 env = Environment()
 
 env.Append(CXXFLAGS=['-Wall', '-O3', '-std=c++11'])
 env.Append(CFLAGS=['-Wall', '-O3'])
+env.Append(LINKFLAGS=['-undefined', 'dynamic_lookup'])
 
 # Build libsystemc-2.3.1.so. You can use the returned object to link systemc
 # to your own project.
