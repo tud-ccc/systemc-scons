@@ -35,52 +35,26 @@
 #include <algorithm> // std::swap
 
 #include "sysc/kernel/sc_object.h"
-#include "sysc/packages/boost/config.hpp"
-#include "sysc/packages/boost/utility/enable_if.hpp"
+#include <type_traits>
 
 //#define SC_VECTOR_HEADER_ONLY_
 
 namespace sc_core {
 namespace sc_meta {
 
-  using ::sc_boost::enable_if;
-
-  // simplistic version to avoid Boost et.al.
-  template< typename T > struct remove_const          { typedef T type; };
-  template< typename T > struct remove_const<const T> { typedef T type; };
-
-  template< typename T, typename U >
-  struct is_same      { SC_BOOST_STATIC_CONSTANT( bool, value = false ); };
-  template< typename T >
-  struct is_same<T,T> { SC_BOOST_STATIC_CONSTANT( bool, value = true );  };
-
-  template< typename T >
-  struct is_const           { SC_BOOST_STATIC_CONSTANT( bool, value = false ); };
-  template< typename T >
-  struct is_const< const T> { SC_BOOST_STATIC_CONSTANT( bool, value = true );  };
+  using ::std::enable_if;
+  using ::std::remove_const;
+  using ::std::is_same;
+  using ::std::is_const;
 
   template< typename CT, typename T >
   struct is_more_const {
-    SC_BOOST_STATIC_CONSTANT( bool, value
+    static constexpr bool value
        = ( is_same< typename remove_const<CT>::type
                  , typename remove_const<T>::type
                  >::value
-          && ( is_const<CT>::value >= is_const<T>::value ) ) );
+          && ( is_const<CT>::value >= is_const<T>::value ) );
   };
-
-  struct special_result {};
-  template< typename T > struct remove_special_fptr {};
-  template< typename T > 
-  struct remove_special_fptr< special_result& (*)( T ) >
-    { typedef T type; };
-
-#define SC_RPTYPE_(Type)                                   \
-  typename ::sc_core::sc_meta::remove_special_fptr         \
-    < ::sc_core::sc_meta::special_result& (*) Type >::type
-
-#define SC_ENABLE_IF_( Cond )                              \
-  typename ::sc_core::sc_meta::enable_if                   \
-    < SC_RPTYPE_(Cond) >::type * = NULL
 
 } // namespace sc_meta
 
@@ -203,11 +177,11 @@ struct sc_direct_access
   sc_direct_access(){}
   sc_direct_access( const non_const_policy& ) {}
   // convert from any policy to (const) direct policy
-  template<typename U>
-  sc_direct_access( const U&
-    , SC_ENABLE_IF_((
-        sc_meta::is_more_const<type,typename U::policy::element_type>
-    )) )
+  template <typename U>
+  sc_direct_access(const U&,
+                   typename sc_meta::enable_if<sc_meta::is_more_const<
+                     type,
+                     typename U::policy::element_type>::value>::type* = NULL)
   {}
 
   type* get( type* this_ ) const
@@ -306,11 +280,9 @@ public:
   // iterator conversions to more const, and/or direct iterators
   template< typename OtherElement, typename OtherPolicy >
   sc_vector_iter( const sc_vector_iter<OtherElement, OtherPolicy>& it
-      , SC_ENABLE_IF_((
-          sc_meta::is_more_const< element_type
-                                , typename OtherPolicy::element_type >
-        ))
-      )
+      , typename sc_meta::enable_if<sc_meta::is_more_const<
+                     element_type,
+                     typename OtherPolicy::element_type>::value>::type* = NULL)
     : access_policy( it.get_policy() ), it_( it.it_ )
   {}
 

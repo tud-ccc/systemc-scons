@@ -31,7 +31,10 @@
 #define SC_MACHINE_H
 
 #include <climits>
-#include "sysc/packages/boost/detail/endian.hpp"
+//#include "sysc/packages/boost/detail/endian.hpp"
+
+// We stripped the boost include and assume a build on x86
+#define SC_BOOST_LITTLE_ENDIAN
 
 // ----------------------------------------------------------------------------
 //  Little or big endian machine?
