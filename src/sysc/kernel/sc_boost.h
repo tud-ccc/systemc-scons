@@ -41,8 +41,7 @@
 #   pragma warning(disable: 4514)  // unreferenced inline removed
 #endif
 
-#include "sysc/packages/boost/bind.hpp"
-#include "sysc/packages/boost/ref.hpp"
+#include <functional>
 
 #if defined(SC_BOOST_MSVC) && (SC_BOOST_MSVC < 1300)
 #   pragma warning(push, 3)
@@ -60,9 +59,9 @@
 // boost. to replace the version shipped with SystemC with another boost
 // you will need to change the namespace prefix back to boost.
 
-#define sc_bind    sc_boost::bind
-#define sc_ref(r)  sc_boost::ref(r)
-#define sc_cref(r) sc_boost::cref(r)
+#define sc_bind    std::bind
+#define sc_ref(r)  std::ref(r)
+#define sc_cref(r) std::cref(r)
 
 // $Log: sc_boost.h,v $
 // Revision 1.7  2011/08/26 20:46:09  acg
