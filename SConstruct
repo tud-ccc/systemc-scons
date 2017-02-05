@@ -25,7 +25,8 @@ env = Environment()
 
 env.Append(CXXFLAGS=['-Wall', '-O3', '-std=c++11'])
 env.Append(CFLAGS=['-Wall', '-O3'])
-env.Append(LINKFLAGS=['-undefined', 'dynamic_lookup'])
+if env['PLATFORM'] == 'darwin':
+    env.Append(LINKFLAGS=['-undefined', 'dynamic_lookup'])
 
 # Build libsystemc-2.3.1.so. You can use the returned object to link systemc
 # to your own project.
